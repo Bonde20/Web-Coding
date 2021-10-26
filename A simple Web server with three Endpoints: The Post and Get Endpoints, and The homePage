@@ -1,0 +1,55 @@
+
+package main
+
+import (
+	"fmt"
+	"net/http"
+  "log"
+)
+
+var P Person
+var data []int16
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	fmt.Fprintf(w, "<title>You're Welcome to Go</title>")
+
+	fmt.Fprintf(w, "<h1>Hello World</h1>")
+	fmt.Fprintf(w, "<img src='images/smiley.gif' alt='smiley' style='width:200px;height:200px;'>")
+
+}
+
+func postGet(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Fprintf(w, "<h1>View The Posted Values</h1>")
+	fmt.Fprintf(w, "<img src='images/weaver.jpg' alt='weaver' style='width:200px;height:200px;'>")
+	P = Person{id: 2356, name: "weaver", age: 29}
+	data = append(data, 102, 248, 456, 7570)
+	fmt.Fprintln(w, "<p> The appended slice is:", data)
+
+	fmt.Fprintf(w, "<p> The ID is: %d | The Name is: %s | The Age is:%d", P.id, P.name, P.age)
+
+}
+
+func main() {
+
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images"))))
+	http.HandleFunc("/", homePage)
+	http.HandleFunc("/postget", postGet)
+	fmt.Println("Server starting...")
+	err := http.ListenAndServe(":3000", nil)
+  if err != nil {
+       log.Fatal(err)
+       }
+}
+
+type Person struct {
+	id   int
+	name string
+	age  int
+}
